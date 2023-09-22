@@ -39,11 +39,19 @@ function fetchDataAndRender() {
 						const image = document.createElement("img");
 						image.classList.add("card-img-top");
 
-						let imageSource = item.imageSource;
-						if (item.imageSource && !item.imageSource.startsWith("https")) {
-							imageSource = "/img/uploads/" + item.imageSource;
+						const { imageData } = item;
+						if (imageData != null) {
+							const uint8Array = new Uint8Array(imageData.data);
+							const blob = new Blob([uint8Array]);
+							const fileReader = new FileReader();
+							fileReader.onload = function () {
+								const base64String = fileReader.result.split(",")[1];
+								image.src = `data:image/png;base64,${base64String}`;
+							};
+							fileReader.readAsDataURL(blob);
+						} else {
+							image.src = "https://placehold.co/600x400";
 						}
-						image.setAttribute("src", imageSource);
 						image.style.objectFit = "cover";
 						image.style.setProperty("min-height", "12rem");
 						image.style.setProperty("max-height", "12rem");
